@@ -639,10 +639,10 @@
     </div>
 </div>
 
-<div class="slider-container" data-slider-container="1">
+<div class="slider-container" data-slider-container="1" role="dialog" aria-modal="true" aria-labelledby="portfolio-dialog-title" aria-hidden="true">
     <div class="slider">
         <div class="container">
-            <div class=slide__name">
+            <div class="slide__name">
                 <div class="title-container">
                     <img class="left-arrow-big" src="images/left-arrow-big.png" alt="">
                     <img class="right-arrow-big" src="images/right-arrow-big.png" alt="">
@@ -654,7 +654,7 @@
                               stroke-linejoin="miter" fill="none"
                               d="M0.1000,3.010 C0.1000,3.010 6.894,-1.510 12.531,3.010 C18.167,7.529 23.840,3.010 23.840,3.010 "/>
                     </svg>
-                    <h2 class="offer__title title name__person">Марк и Анастасия</h2>
+                    <h2 class="offer__title title name__person" id="portfolio-dialog-title">Марк и Анастасия</h2>
                     <svg class="figure__right-small"
                          xmlns="http://www.w3.org/2000/svg"
                          xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -665,7 +665,9 @@
                     </svg>
                 </div>
             </div>
-            <img class="pop-up-slider__close" src="images/pop-up-close.png" alt="">
+            <button class="pop-up-slider__close" type="button" aria-label="Закрыть портфолио">
+                <img src="images/pop-up-close.png" alt="">
+            </button>
         </div>
         <div class="big-container">
             <img class="slide active" src="images/popup-slider/slide0/image-1.jpg" alt="Image 1" data-number="1"
