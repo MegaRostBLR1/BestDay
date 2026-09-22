@@ -196,7 +196,7 @@ $(document).ready(function () {
         } else {
             currentSlidePopup--;
             if (currentSlidePopup < 0) {
-                currentSlidePopup = popupSliderStep;
+                currentSlidePopup = popupSliderStep - 1;
             }
             updatePopupSlider(currentSlidePopup);
         }
