@@ -986,6 +986,15 @@ input::placeholder {
     display: none;
 }
 
+.form-request-error {
+    max-width: 320px;
+    margin-top: 12px;
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: center;
+    color: #7a1f1f;
+}
+
 
 
 /*Contacts*/
