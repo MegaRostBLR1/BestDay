@@ -3,23 +3,66 @@ $(document).ready(function () {
         animateClass: 'animate__animated',
     }).init();
 
-    // Бургер меню
-    $('.burger').click(function () {
-        $('.burger__menu').css('display', 'flex');
+    // Бургер-меню и модальные окна
+    const $body = $('body');
+    let lastFocusedElement = null;
+
+    function setModalState($modal, isOpen) {
+        $modal.css('display', isOpen ? 'flex' : 'none');
+        $modal.attr('aria-hidden', String(!isOpen));
+        $body.toggleClass('modal-open', isOpen);
+
+        if (isOpen) {
+            lastFocusedElement = document.activeElement;
+            $modal.find('button, a, input, [tabindex]:not([tabindex="-1"])').first().trigger('focus');
+        } else if (lastFocusedElement) {
+            $(lastFocusedElement).trigger('focus');
+            lastFocusedElement = null;
+        }
+    }
+
+    function closeAllModals() {
+        setModalState($('.burger__menu'), false);
+        setModalState($('.pop-up'), false);
+        setModalState($('.slider-container'), false);
+    }
+
+    $('.burger').on('click', function () {
+        const $menu = $('.burger__menu');
+        const isOpen = $menu.attr('aria-hidden') !== 'true';
+        setModalState($menu, !isOpen);
+        $(this).attr('aria-expanded', String(!isOpen));
     });
 
-    $('.burger-menu__close').click(function () {
-        $('.burger__menu').css('display', 'none');
+    $('.burger-menu__close').on('click', function () {
+        setModalState($('.burger__menu'), false);
+        $('.burger').attr('aria-expanded', 'false').trigger('focus');
     });
 
-
-    // Поп-ап "Заказать звонок"
-    $('.menu__btn').click(function () {
-        $('.pop-up').css('display', 'flex');
+    $('.burger__menu .menu__link').on('click', function () {
+        setModalState($('.burger__menu'), false);
+        $('.burger').attr('aria-expanded', 'false');
     });
 
-    $('.pop-up__close').click(function () {
-        $('.pop-up').css('display', 'none');
+    $('.menu__btn').on('click', function () {
+        setModalState($('.pop-up'), true);
+    });
+
+    $('.pop-up__close').on('click', function () {
+        setModalState($('.pop-up'), false);
+    });
+
+    $('.pop-up, .slider-container').on('click', function (event) {
+        if (event.target === this) {
+            setModalState($(this), false);
+        }
+    });
+
+    $(document).on('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeAllModals();
+            $('.burger').attr('aria-expanded', 'false');
+        }
     });
 
 
@@ -36,8 +79,7 @@ $(document).ready(function () {
     // Слайдер "Наши молодожены"
     const portfolioSlider = $('.portfolio__slider-photo');
     const portfolioNumber = $('.portfolio__number');
-    const portfolioSliderStep = 6;
-    const portfolioSlideWidth = 404;
+    const portfolioSliderStep = portfolioSlider.children().length;
     let currentSlidePortfolio = 0;
 
     const portfolioSliderPagination = [
@@ -82,7 +124,8 @@ $(document).ready(function () {
             updatePortfolioSlider();
         }
 
-        portfolioSlider.css('transform', `translateX(${-currentSlidePortfolio * portfolioSlideWidth}px)`);
+        const slideWidth = portfolioSlider.children().first().outerWidth(true) || 0;
+        portfolioSlider.css('transform', 'translateX(' + (-currentSlidePortfolio * slideWidth) + 'px)');
     }
 
     $('.portfolio__right').click(function () {
@@ -98,11 +141,14 @@ $(document).ready(function () {
     }
 
     $('.portfolio__slide').on('click', function () {
-        $('.slider-container').css('display', 'flex');
-    })
+        currentSlidePopup = $(this).index();
+        updatePopupSlider(currentSlidePopup);
+        updatePopupCounter();
+        setModalState($('.slider-container'), true);
+    });
 
     $('.pop-up-slider__close').on('click', function () {
-        $('.slider-container').css('display', 'none');
+        setModalState($('.slider-container'), false);
     })
 
 
@@ -110,8 +156,7 @@ $(document).ready(function () {
     const popupSlider = $('.big-container');
     const namePerson = $('.name__person');
     const thumbnailsItem = $('.thumbnails__item')
-    const popupSliderStep = 6;
-    const popupSlideWidth = 692;
+    const popupSliderStep = popupSlider.children().length;
     let currentSlidePopup = 0;
 
     function scrollSlider(step) {
@@ -129,56 +174,40 @@ $(document).ready(function () {
             updatePopupSlider(currentSlidePopup);
         }
 
-        popupSlider.css('transform', `translateX(${-currentSlidePopup * popupSlideWidth}px)`);
+        const slideWidth = popupSlider.children().first().outerWidth(true) || 0;
+        popupSlider.css('transform', 'translateX(' + (-currentSlidePopup * slideWidth) + 'px)');
+        updatePopupCounter();
     }
 
-    $('.right-arrow-last').click(function () {
-        scrollSlider(1);
-
-        let currentActive = $('.thumbnails__item.active');
-        let nextItem = currentActive.next('.thumbnails__item');
-
-        if (nextItem.length === 0) {
-            nextItem = $('.thumbnails__item:first');
-        }
-
+    function updatePopupCounter() {
+        const $active = thumbnailsItem.eq(currentSlidePopup);
         thumbnailsItem.removeClass('active');
-        nextItem.addClass('active');
-
-        let slideNumber = nextItem.attr('number');
-        $('.slider__digit').text(slideNumber + ' / ');
+        $active.addClass('active');
+        $('.slider__digit').text((currentSlidePopup + 1) + ' / ');
         $('.slider__full-number').text(thumbnailsItem.length);
+        updatePopupSlider(currentSlidePopup);
+    }
+
+    $('.right-arrow-last').on('click', function () {
+        scrollSlider(1);
     });
 
-    $('.left-arrow-last').click(function () {
+    $('.left-arrow-last').on('click', function () {
         scrollSlider(0);
-
-        let currentActive = $('.thumbnails__item.active');
-        let prevItem = currentActive.prev('.thumbnails__item');
-
-        if (prevItem.length === 0) {
-            prevItem = $('.thumbnails__item:last');
-        }
-
-        thumbnailsItem.removeClass('active');
-        prevItem.addClass('active');
-
-        // Обновление номера слайда
-        let slideNumber = prevItem.attr('number');
-        $('.slider__digit').text(slideNumber + ' / ');
-        $('.slider__full-number').text(thumbnailsItem.length);
     });
 
     function updatePopupSlider(currentSlidePopup) {
-        namePerson.text(portfolioSliderPagination[currentSlidePopup].persons);
+        const slide = portfolioSliderPagination[currentSlidePopup];
+        if (slide) {
+            namePerson.text(slide.persons);
+        }
     }
 
 
     if ($(window).width() <= 1120) {
 
         const miniSlider = $('.thumbnails');
-        const miniSliderStep = 6;
-        const miniSliderWidth = 180;
+        const miniSliderStep = miniSlider.children().length;
         let miniSliderCurrent = 0;
 
         function moveMiniSlider(step) {
@@ -193,7 +222,8 @@ $(document).ready(function () {
                     miniSliderCurrent = miniSliderStep -1;
                 }
             }
-            miniSlider.css('transform', `translateX(${-miniSliderCurrent * miniSliderWidth}px)`);
+            const thumbnailWidth = miniSlider.children().first().outerWidth(true) || 0;
+            miniSlider.css('transform', 'translateX(' + (-miniSliderCurrent * thumbnailWidth) + 'px)');
         }
 
         $('.right-arrow-small').click(function () {
@@ -272,127 +302,98 @@ $(document).ready(function () {
         descriptionContainer.css('color', '#FFFFFF').text(reviewSliders[currentSlideReviews].description);
     }
 
-    // Валидация формы "Запишитесь на консультацию"
-    $('.on-submit').on('click', function (e) {
-        e.preventDefault();
-
+    // Валидация и отправка форм
+    function validateForm($form, nameSelector, phoneSelector, errorSelector) {
+        const $name = $form.find(nameSelector);
+        const $phone = $form.find(phoneSelector);
         let hasError = false;
 
-        const name = $('.name');
-        const phone = $('.phone');
-        const form = $(this).closest('.form');
-        const thanks = $('.thanks');
-        const formInfo = $('.consultation__form-info');
+        $form.find(errorSelector).hide();
+        $name.removeAttr('aria-invalid').css('border-color', '#FFFFFF');
+        $phone.removeAttr('aria-invalid').css('border-color', '#FFFFFF');
 
-        phone.keypress(function (event) {
-            let number = event.key;
-            if (isNaN(number)) {
-                event.preventDefault();
+        if (!$name.val().trim()) {
+            $name.attr('aria-invalid', 'true').css('border-color', 'red');
+            $name.next(errorSelector).show();
+            hasError = true;
+        }
+
+        if (!$phone.val().trim()) {
+            $phone.attr('aria-invalid', 'true').css('border-color', 'red');
+            $phone.next(errorSelector).show();
+            hasError = true;
+        }
+
+        return hasError;
+    }
+
+    function submitForm($form, $button, selectors) {
+        if (validateForm($form, selectors.name, selectors.phone, selectors.error)) {
+            return;
+        }
+
+        $button.prop('disabled', true).attr('aria-busy', 'true');
+
+        $.ajax({
+            method: 'post',
+            url: 'https://testologia.ru/checkout',
+            data: {
+                name: $form.find(selectors.name).val().trim(),
+                phone: $form.find(selectors.phone).val().trim()
             }
-        });
-
-        $('.error-input').hide();
-
-        if (!name.val()) {
-            name.next().show();
-            name.css('border-color', 'red');
-            hasError = true;
-        } else {
-            name.css('border-color', '#FFFFFF');
-            name.next().hide();
-        }
-
-        if (!phone.val()) {
-            phone.next().show();
-            phone.css('border-color', 'red');
-            hasError = true;
-        } else {
-            phone.css('border-color', '#FFFFFF');
-            phone.next().hide();
-        }
-
-        if (!hasError) {
-            $.ajax({
-                method: 'post',
-                url: "http://testologia.ru/checkout",
-                data: {name: name.val(), phone: phone.val()}
+        })
+            .done(function (msg) {
+                if (msg && msg.success === 1) {
+                    $form.hide();
+                    $form.siblings(selectors.thanks).show();
+                    $form[0].reset();
+                    window.setTimeout(function () {
+                        $form.siblings(selectors.thanks).hide();
+                        $form.css('display', 'flex');
+                    }, 5000);
+                } else {
+                    alert('Не удалось отправить заявку. Пожалуйста, попробуйте ещё раз или свяжитесь с нами по телефону.');
+                }
             })
-                .done(function (msg) {
-                    if (msg.success === 1) {
-                        form.css('display', 'none');
-                        formInfo.css('display', 'none');
-                        thanks.css('display', 'block');
-                        form[0].reset();
-                    } else {
-                        alert('Возникла ошибка при оформлении заказа, позвоните нам и запишитесь на консультацию');
-                    }
-                });
-        }
-        setTimeout(() => {
-            thanks.css('display', 'none');
-            formInfo.css('display', 'block');
-            form.css('display', 'flex');
-        }, 5000)
+            .fail(function () {
+                alert('Не удалось отправить заявку из-за ошибки соединения. Пожалуйста, попробуйте ещё раз или свяжитесь с нами по телефону.');
+            })
+            .always(function () {
+                $button.prop('disabled', false).removeAttr('aria-busy');
+            });
+    }
+
+    $('.consultation__form').on('submit', function (event) {
+        event.preventDefault();
+        submitForm($(this), $(this).find('.on-submit'), {
+            name: '.name',
+            phone: '.phone',
+            error: '.error-input',
+            thanks: '.thanks'
+        });
     });
 
-    // Форма в Pop-up
-    $('.submit').click(function (e) {
-        e.preventDefault();
-
-        let hasErr = false;
-
-        const namePopUp = $('.name-pop-up');
-        const phonePopUp = $('.phone-pop-up');
-        const formPopUp = $(this).closest('.pop-up__form');
-        const thanksPopUp = $('.pop-up__thanks');
-
-        phonePopUp.keypress(function (event) {
-            let number = event.key;
-            if (isNaN(number)) {
-                event.preventDefault();
-            }
+    $('.pop-up__form').on('submit', function (event) {
+        event.preventDefault();
+        submitForm($(this), $(this).find('.submit'), {
+            name: '.name-pop-up',
+            phone: '.phone-pop-up',
+            error: '.error-input-popup',
+            thanks: '.pop-up__thanks'
         });
+    });
 
-        $('.error-input').hide();
+    $('.portfolio__right, .portfolio__left, .right-arrow-last, .left-arrow-last, .right-arrow-small, .left-arrow-small, .right-arrow, .left-arrow, .right-arrow-big, .left-arrow-big').each(function () {
+        $(this).attr({
+            role: 'button',
+            tabindex: '0'
+        });
+    });
 
-        if (!namePopUp.val()) {
-            namePopUp.next().show();
-            namePopUp.css('border-color', 'red');
-            hasErr = true;
-        } else {
-            namePopUp.css('border-color', '#FFFFFF');
-            namePopUp.next().hide();
+    $(document).on('keydown', '[role="button"]', function (event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            $(this).trigger('click');
         }
-
-        if (!phonePopUp.val()) {
-            phonePopUp.next().show();
-            phonePopUp.css('border-color', 'red');
-            hasErr = true;
-        } else {
-            phonePopUp.css('border-color', '#FFFFFF');
-            phonePopUp.next().hide();
-        }
-
-        if (!hasErr) {
-            $.ajax({
-                method: 'post',
-                url: "http://testologia.ru/checkout",
-                data: {name: namePopUp.val(), phone: phonePopUp.val()}
-            })
-                .done(function (msg) {
-                    if (msg.success === 1) {
-                        formPopUp.css('display', 'none');
-                        thanksPopUp.css('display', 'block');
-                        formPopUp[0].reset();
-                    } else {
-                        alert('Возникла ошибка при оформлении заказа, позвоните нам и запишитесь на консультацию');
-                    }
-                });
-        }
-        setTimeout(() => {
-            thanksPopUp.css('display', 'none');
-            formPopUp.css('display', 'flex');
-        }, 5000)
-
     });
 });
