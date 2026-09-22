@@ -1,4 +1,6 @@
 $(document).ready(function () {
+    const formEndpoint = window.BEST_DAY_FORM_ENDPOINT || '';
+
     new WOW({
         animateClass: 'animate__animated',
     }).init();
@@ -364,11 +366,23 @@ $(document).ready(function () {
             return;
         }
 
+        if (!formEndpoint) {
+            const $status = $form.find('.form-request-error');
+
+            if ($status.length) {
+                $status.text('Форма пока не подключена к рабочему каналу отправки. Пожалуйста, свяжитесь с нами по телефону.');
+            } else {
+                $('<div class="form-request-error" role="alert">Форма пока не подключена к рабочему каналу отправки. Пожалуйста, свяжитесь с нами по телефону.</div>').insertAfter($button);
+            }
+
+            return;
+        }
+
         $button.prop('disabled', true).attr('aria-busy', 'true');
 
         $.ajax({
             method: 'post',
-            url: 'https://testologia.ru/checkout',
+            url: formEndpoint,
             data: {
                 name: $form.find(selectors.name).val().trim(),
                 phone: $form.find(selectors.phone).val().trim()
