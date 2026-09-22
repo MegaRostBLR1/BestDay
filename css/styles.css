@@ -49,6 +49,34 @@ body {
     background-color: #f6f6f6;
 }
 
+body.modal-open {
+    overflow: hidden;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+    outline: 3px solid #8f5f38;
+    outline-offset: 3px;
+}
+
+button:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
 a {
     text-decoration: none;
 }
@@ -175,6 +203,35 @@ button {
 
 .burger {
     display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: transparent;
+    border-radius: 50%;
+}
+
+.burger img {
+    display: block;
+}
+
+.burger-menu__close,
+.pop-up__close,
+.pop-up-slider__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border: 0;
+    background: transparent;
+    border-radius: 50%;
+}
+
+.burger-menu__close img,
+.pop-up__close img,
+.pop-up-slider__close img {
+    display: block;
 }
 
 
@@ -929,6 +986,15 @@ input::placeholder {
     display: none;
 }
 
+.form-request-error {
+    max-width: 320px;
+    margin-top: 12px;
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: center;
+    color: #7a1f1f;
+}
+
 
 
 /*Contacts*/
@@ -1058,6 +1124,9 @@ input::placeholder {
 .pop-up__container {
     position: relative;
     display: flex;
+    max-width: calc(100vw - 30px);
+    max-height: calc(100vh - 30px);
+    overflow-y: auto;
     background-color: #f6f6f6;
     border-radius: 10px;
 }
@@ -1181,6 +1250,8 @@ input::placeholder {
 .slider {
     position: relative;
     display: flex;
+    max-height: calc(100vh - 30px);
+    overflow-y: auto;
     flex-direction: column;
     width: 100%;
     background-color: #FFFFFF;
@@ -1189,7 +1260,9 @@ input::placeholder {
 }
 
 .slider .container {
-    width: 1200px;
+    width: min(1200px, 100%);
+    max-width: 100%;
+    overflow-x: hidden;
     margin: 0 auto;
     position: relative;
 }
@@ -1286,4 +1359,19 @@ input::placeholder {
     font-family: "Gilroy-Bold", sans-serif;
     color: rgb(85, 49, 14);
     text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }
