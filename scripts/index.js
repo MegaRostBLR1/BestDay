@@ -59,9 +59,34 @@ $(document).ready(function () {
     });
 
     $(document).on('keydown', function (event) {
+        const $openModal = $('.burger__menu:visible, .pop-up:visible, .slider-container:visible').last();
+
+        if (!$openModal.length) {
+            return;
+        }
+
         if (event.key === 'Escape') {
             closeAllModals();
             $('.burger').attr('aria-expanded', 'false');
+            return;
+        }
+
+        if (event.key === 'Tab') {
+            const $focusable = $openModal.find('button, a, input, [tabindex]:not([tabindex="-1"])').filter(':visible:not(:disabled)');
+            if (!$focusable.length) {
+                return;
+            }
+
+            const first = $focusable[0];
+            const last = $focusable[$focusable.length - 1];
+
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
         }
     });
 
@@ -318,9 +343,11 @@ $(document).ready(function () {
             hasError = true;
         }
 
-        if (!$phone.val().trim()) {
+        const phoneDigits = $phone.val().replace(/\D/g, '');
+
+        if (phoneDigits.length < 7) {
             $phone.attr('aria-invalid', 'true').css('border-color', 'red');
-            $phone.next(errorSelector).show();
+            $phone.next(errorSelector).text('Введите корректный телефон').show();
             hasError = true;
         }
 
@@ -384,9 +411,21 @@ $(document).ready(function () {
     });
 
     $('.portfolio__right, .portfolio__left, .right-arrow-last, .left-arrow-last, .right-arrow-small, .left-arrow-small, .right-arrow, .left-arrow, .right-arrow-big, .left-arrow-big').each(function () {
-        $(this).attr({
+        const $control = $(this);
+        let label = 'Переключить слайд';
+
+        if ($control.hasClass('left-arrow') || $control.hasClass('left-arrow-big')) {
+            label = 'Предыдущий слайд';
+        }
+
+        if ($control.hasClass('right-arrow') || $control.hasClass('right-arrow-big')) {
+            label = 'Следующий слайд';
+        }
+
+        $control.attr({
             role: 'button',
-            tabindex: '0'
+            tabindex: '0',
+            'aria-label': label
         });
     });
 
