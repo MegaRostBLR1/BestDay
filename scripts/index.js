@@ -343,9 +343,14 @@ $(document).ready(function () {
             hasError = true;
         }
 
-        const phoneDigits = $phone.val().replace(/\D/g, '');
+        const phoneValue = $phone.val().trim();
+        const phoneDigits = phoneValue.replace(/\D/g, '');
 
-        if (phoneDigits.length < 7) {
+        if (!phoneValue) {
+            $phone.attr('aria-invalid', 'true').css('border-color', 'red');
+            $phone.next(errorSelector).text('Введите ваш телефон').show();
+            hasError = true;
+        } else if (phoneDigits.length < 7) {
             $phone.attr('aria-invalid', 'true').css('border-color', 'red');
             $phone.next(errorSelector).text('Введите корректный телефон').show();
             hasError = true;
