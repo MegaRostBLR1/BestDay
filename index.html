@@ -2,8 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Организация свадеб под ключ и координация свадебного дня от агентства Best Day.">
+    <meta name="theme-color" content="#f6f6f6">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Best Day</title>
     <link rel="stylesheet" href="css/animate.css">
@@ -14,7 +15,7 @@
 
 <header class="header">
     <div class="container header__container">
-        <a class="logo" href="">
+        <a class="logo" href="/" aria-label="Best Day — на главную">
             <div class="logo__img-container">
                 <img class="logo__img" src="images/logo.png" alt="">
             </div>
@@ -41,8 +42,10 @@
         </nav>
         <div class="menu__action">
             <button class="menu__btn btn-transparent" type="button">Заказать звонок</button>
-            <div class="menu__btn menu__btn-mobile"></div>
-            <img class="burger" src="images/menu.png" alt="">
+            <button class="menu__btn menu__btn-mobile" type="button" aria-label="Заказать звонок"></button>
+            <button class="burger" type="button" aria-label="Открыть меню" aria-controls="mobile-menu" aria-expanded="false">
+                <img src="images/menu.png" alt="">
+            </button>
         </div>
     </div>
 </header>
@@ -446,13 +449,15 @@
             <div class="consultation__form-container">
                 <p class="consultation__form-info">Чтобы назначить дату встречи, или уточнить какой-то вопрос,
                     пожалуйста, заполните форму ниже </p>
-                <form class="form consultation__form" action="" id="order">
+                <form class="form consultation__form" action="" id="order" novalidate>
                     <div class="input__item">
-                        <input class="name" type="text" placeholder="Ваше имя" id="name">
-                        <div class="error-input">Введите ваше имя</div>
+                        <label class="visually-hidden" for="name">Ваше имя</label>
+                        <input class="name" type="text" placeholder="Ваше имя" id="name" autocomplete="name" required>
+                        <div class="error-input" aria-live="polite">Введите ваше имя</div>
                     </div>
                     <div class="input__item">
-                        <input class="phone" type="tel" placeholder="Ваш телефон" id="phone">
+                        <label class="visually-hidden" for="phone">Ваш телефон</label>
+                        <input class="phone" type="tel" placeholder="Ваш телефон" id="phone" autocomplete="tel" inputmode="tel" required>
                         <div class="error-input">Введите ваш телефон</div>
                     </div>
                     <button type="button" class="form__btn btn-reverse on-submit">Записаться</button>
@@ -535,10 +540,12 @@
     </div>
 </footer>
 
-<div class="burger__menu">
+<div class="burger__menu" id="mobile-menu" role="dialog" aria-modal="true" aria-labelledby="mobile-menu-title" aria-hidden="true">
     <div class="burger__menu-container">
         <div class="burger__menu-img-container">
-            <img class="burger-menu__close" src="images/pop-up-close.png" alt="">
+            <button class="burger-menu__close" type="button" aria-label="Закрыть меню">
+                <img src="images/pop-up-close.png" alt="">
+            </button>
         </div>
         <div class="menu__title">
             <div class="title-container">
@@ -550,7 +557,7 @@
                           stroke-linejoin="miter" fill="none"
                           d="M0.1000,3.010 C0.1000,3.010 6.894,-1.510 12.531,3.010 C18.167,7.529 23.840,3.010 23.840,3.010 "/>
                 </svg>
-                <h2 class="title">Меню</h2>
+                <h2 class="title" id="mobile-menu-title">Меню</h2>
                 <svg class="figure__right-small"
                      xmlns="http://www.w3.org/2000/svg"
                      xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -585,10 +592,12 @@
     </div>
 </div>
 
-<div class="pop-up">
+<div class="pop-up" role="dialog" aria-modal="true" aria-labelledby="callback-title" aria-hidden="true">
     <div class="pop-up__container">
         <div class="pop-up__img-container">
-            <img class="pop-up__close" src="images/pop-up-close.png" alt="">
+            <button class="pop-up__close" type="button" aria-label="Закрыть окно">
+                <img src="images/pop-up-close.png" alt="">
+            </button>
         </div>
         <div class="pop-up__form-container">
             <div class="pop-up__title">
@@ -601,7 +610,7 @@
                               stroke-linejoin="miter" fill="none"
                               d="M0.1000,3.010 C0.1000,3.010 6.894,-1.510 12.531,3.010 C18.167,7.529 23.840,3.010 23.840,3.010 "/>
                     </svg>
-                    <h2 class="title">Заказать звонок</h2>
+                    <h2 class="title" id="callback-title">Заказать звонок</h2>
                     <svg class="figure__right-small"
                          xmlns="http://www.w3.org/2000/svg"
                          xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -612,13 +621,15 @@
                     </svg>
                 </div>
             </div>
-            <p class="pop-up__description">Оставьте заявку и мы перезвоним Вам в течении 15 минут.</p>
-            <form class="form pop-up__form" action="">
-                <input class="name-pop-up" type="text" placeholder="Ваше имя" id="name-pop-up">
-                <div class="error-input-popup">Введите ваше имя</div>
-                <input class="phone-pop-up" type="tel" placeholder="+ 7 ( _ _ _ ) _ _ _ - _ _ - _ _" id="phone-pop-up">
+            <p class="pop-up__description">Оставьте заявку, и мы перезвоним Вам в течение 15 минут.</p>
+            <form class="form pop-up__form" action="" novalidate>
+                <label class="visually-hidden" for="name-pop-up">Ваше имя</label>
+                <input class="name-pop-up" type="text" placeholder="Ваше имя" id="name-pop-up" autocomplete="name" required>
+                <div class="error-input-popup" aria-live="polite">Введите ваше имя</div>
+                <label class="visually-hidden" for="phone-pop-up">Ваш телефон</label>
+                <input class="phone-pop-up" type="tel" placeholder="+ 7 ( _ _ _ ) _ _ _ - _ _ - _ _" id="phone-pop-up" autocomplete="tel" inputmode="tel" required>
                 <div class="error-input-popup">Введите ваш телефон</div>
-                <button class="pop-up__btn btn-reverse submit" type="button">Заказать звонок</button>
+                <button class="pop-up__btn btn-reverse submit" type="submit">Заказать звонок</button>
                 <span class="pop-up__form-text">Нажимая на кнопку, Вы соглашаетесь&nbspна <a href="#">Обработку персональных данных</a></span>
             </form>
             <div class="pop-up__thanks">
